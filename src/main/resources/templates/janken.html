@@ -12,6 +12,16 @@
   <div th:if="${userName != null}">
     Hi [[${userName}]]
   </div>
+  <div>
+    <a href="/jankengame?hand=Gu">グー</a>
+    <a href="/jankengame?hand=Choki">チョキ</a>
+    <a href="/jankengame?hand=Pa">パー</a>
+  </div>
+  <div th:if="${janken != null}">
+    <div>あなたの手：[[${janken.userHand}]]</div>
+    <div>相手の手：[[${janken.cpuHand}]]</div>
+    <div>結果：[[${janken.result}]]</div>
+  </div>
   <p><a href="/">名前の入力画面へ戻る</a></p>
 </body>
 
