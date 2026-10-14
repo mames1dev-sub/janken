@@ -8,9 +8,16 @@
 </head>
 
 <body>
+  <div><a href="/logout">ログアウト</a></div>
   <h1>Janken GAME!</h1>
-  <div th:if="${userName != null}">
-    Hi [[${userName}]]
+  <h2>エントリー</h2>
+  <div th:if="${entry}">
+    <ul>
+      <li th:each="user : ${entry.users}">[[${user}]]</li>
+    </ul>
+  </div>
+  <div th:if="${login_user}">
+    Hi [[${login_user}]]
   </div>
   <div>
     <a href="/jankengame?hand=Gu">グー</a>
@@ -22,7 +29,7 @@
     <div>相手の手：[[${janken.cpuHand}]]</div>
     <div>結果：[[${janken.result}]]</div>
   </div>
-  <p><a href="/">名前の入力画面へ戻る</a></p>
+  <p><a href="/">トップページへ戻る</a></p>
 </body>
 
 </html>
