@@ -11,6 +11,17 @@
   <div><a href="/logout">ログアウト</a></div>
   <h1>Match</h1>
   <h2>[[${login_user}]] vs [[${opponent.name}]]</h2>
+  <div th:if="${opponent.name == 'CPU'}">
+    <a th:href="@{/fight(id=${opponent.id},hand='Gu')}">グー</a>
+    <a th:href="@{/fight(id=${opponent.id},hand='Choki')}">チョキ</a>
+    <a th:href="@{/fight(id=${opponent.id},hand='Pa')}">パー</a>
+  </div>
+  <div th:if="${janken != null}">
+    <div>[[${login_user}]]の手：[[${janken.userHand}]]</div>
+    <div>[[${opponent.name}]]の手：[[${janken.cpuHand}]]</div>
+    <div>結果：[[${janken.result}]]</div>
+  </div>
+  <a href="/janken">もどる</a>
 </body>
 
 </html>
