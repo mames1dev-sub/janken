@@ -38,6 +38,19 @@ public class JankenController {
     return "janken.html";
   }
 
+  @GetMapping("/match")
+  public String match(@RequestParam Integer id, Principal prin, ModelMap model) {
+    User opponent = userMapper.selectById(id);
+    if (opponent == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザが見つかりません。");
+    }
+    String loginUser = prin.getName();
+    model.addAttribute("login_user", loginUser);
+    model.addAttribute("opponent", opponent);
+
+    return "match.html";
+  }
+
   @GetMapping("/jankengame")
   public String play(@RequestParam String hand, Principal prin, ModelMap model) {
     try {
