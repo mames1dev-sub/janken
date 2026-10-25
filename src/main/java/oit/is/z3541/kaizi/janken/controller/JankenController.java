@@ -1,6 +1,7 @@
 package oit.is.z3541.kaizi.janken.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,27 +11,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-import oit.is.z3541.kaizi.janken.model.Entry;
 import oit.is.z3541.kaizi.janken.model.Janken;
+import oit.is.z3541.kaizi.janken.model.User;
+import oit.is.z3541.kaizi.janken.model.UserMapper;
 
 @Controller
 public class JankenController {
 
   @Autowired
-  private Entry entry;
+  private UserMapper userMapper;
 
-  // ログイン済みのユーザを、DIで共有しているエントリー一覧に追加する。
   @GetMapping("/janken")
   public String janken(Principal prin, ModelMap model) {
     String loginUser = prin.getName();
-    this.entry.addUser(loginUser);
-    model.addAttribute("entry", this.entry);
+    ArrayList<User> users = userMapper.selectAllUsers();
+    model.addAttribute("users", users);
     model.addAttribute("login_user", loginUser);
 
     return "janken.html";
   }
 
-  // リンクで選んだ手をモデルに渡し、対戦結果を画面に表示する。
   @GetMapping("/jankengame")
   public String play(@RequestParam String hand, Principal prin, ModelMap model) {
     try {
@@ -40,8 +40,8 @@ public class JankenController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
     }
     String loginUser = prin.getName();
-    this.entry.addUser(loginUser);
-    model.addAttribute("entry", this.entry);
+    ArrayList<User> users = userMapper.selectAllUsers();
+    model.addAttribute("users", users);
     model.addAttribute("login_user", loginUser);
 
     return "janken.html";
