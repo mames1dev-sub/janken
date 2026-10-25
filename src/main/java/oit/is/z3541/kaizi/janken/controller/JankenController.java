@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +49,39 @@ public class JankenController {
     model.addAttribute("login_user", loginUser);
     model.addAttribute("opponent", opponent);
 
+    return "match.html";
+  }
+
+  @GetMapping("/fight")
+  @Transactional
+  public String fight(@RequestParam Integer id, @RequestParam String hand, Principal prin, ModelMap model) {
+    String loginUser = prin.getName();
+    User user = userMapper.selectByName(loginUser);
+    User opponent = userMapper.selectById(id);
+    if (user == null || opponent == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザが見つかりません。");
+    }
+    if (!"CPU".equals(opponent.getName())) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "対戦相手はCPUを選択してください。");
+    }
+
+    Janken janken;
+    try {
+      janken = new Janken(hand);
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+    }
+
+    Match match = new Match();
+    match.setUser1(user.getId());
+    match.setUser2(opponent.getId());
+    match.setUser1Hand(hand);
+    match.setUser2Hand("Gu");
+    matchMapper.insertMatch(match);
+
+    model.addAttribute("login_user", loginUser);
+    model.addAttribute("opponent", opponent);
+    model.addAttribute("janken", janken);
     return "match.html";
   }
 
