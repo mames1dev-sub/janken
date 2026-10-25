@@ -20,7 +20,6 @@ public class JankenAuthConfiguration {
             .logoutUrl("/logout")
             .logoutSuccessUrl("/"))
         .authorizeHttpRequests(authz -> authz
-            // /jankenだけでなく、/jankengameもログインを必要とする。
             .requestMatchers("/janken*/**").authenticated()
             .anyRequest().permitAll());
     return http.build();
@@ -28,13 +27,15 @@ public class JankenAuthConfiguration {
 
   @Bean
   public InMemoryUserDetailsManager userDetailsService() {
-    // サンプルと同じ形式で、BCryptのハッシュ値を登録する。
     UserDetails user1 = User.withUsername("user1")
         .password("{bcrypt}$2a$10$zXt1JAr.45GsVinYr3dxGuG/16uG5P0qnIesYXpil.Fts4gyrccP6")
         .roles("USER").build();
     UserDetails user2 = User.withUsername("user2")
         .password("{bcrypt}$2a$10$XGQeLUXjOXz2yAO4d2COMeaRzXjRlrXByc8ggezrLoFAnU6NjhtRa")
         .roles("USER").build();
-    return new InMemoryUserDetailsManager(user1, user2);
+    UserDetails honda = User.withUsername("ほんだ")
+        .password("{bcrypt}$2a$10$zXt1JAr.45GsVinYr3dxGuG/16uG5P0qnIesYXpil.Fts4gyrccP6")
+        .roles("USER").build();
+    return new InMemoryUserDetailsManager(user1, user2, honda);
   }
 }
