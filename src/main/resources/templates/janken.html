@@ -13,7 +13,9 @@
   <h2>エントリー</h2>
   <div th:if="${users}">
     <ul>
-      <li th:each="user : ${users}">[[${user.name}]]</li>
+      <li th:each="user : ${users}">
+        <a th:href="@{/match(id=${user.id})}">[[${user.name}]]</a>
+      </li>
     </ul>
   </div>
   <div th:if="${login_user}">
