@@ -5,12 +5,14 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import oit.is.z3541.kaizi.janken.model.Janken;
 import oit.is.z3541.kaizi.janken.model.Match;
@@ -19,6 +21,7 @@ import oit.is.z3541.kaizi.janken.model.MatchInfoMapper;
 import oit.is.z3541.kaizi.janken.model.MatchMapper;
 import oit.is.z3541.kaizi.janken.model.User;
 import oit.is.z3541.kaizi.janken.model.UserMapper;
+import oit.is.z3541.kaizi.janken.service.AsyncKekka;
 
 @Controller
 public class JankenController {
@@ -31,6 +34,9 @@ public class JankenController {
 
   @Autowired
   private MatchInfoMapper matchInfoMapper;
+
+  @Autowired
+  private AsyncKekka asyncKekka;
 
   @GetMapping("/janken")
   public String janken(Principal prin, ModelMap model) {
@@ -74,6 +80,8 @@ public class JankenController {
 
     MatchInfo matchInfo = matchInfoMapper.selectActiveByUsers(opponent.getId(), user.getId());
     if (matchInfo == null) {
+      model.addAttribute("afterId", matchMapper.selectLastMatchId());
+      model.addAttribute("opponentId", opponent.getId());
       matchInfo = new MatchInfo();
       matchInfo.setUser1(user.getId());
       matchInfo.setUser2(opponent.getId());
@@ -91,10 +99,23 @@ public class JankenController {
 
       matchInfo.setIsActive(false);
       matchInfoMapper.updateById(matchInfo);
+      model.addAttribute("match", match);
     }
 
     model.addAttribute("login_user", loginUser);
     return "wait.html";
+  }
+
+  @GetMapping(value = "/janken/result", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public SseEmitter result(@RequestParam Integer opponentId, @RequestParam Integer afterId, Principal prin) {
+    User user = userMapper.selectByName(prin.getName());
+    User opponent = userMapper.selectById(opponentId);
+    if (user == null || opponent == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ユーザが見つかりません。");
+    }
+    final SseEmitter emitter = new SseEmitter();
+    this.asyncKekka.asyncShowResult(emitter, user.getId(), opponent.getId(), afterId);
+    return emitter;
   }
 
   @GetMapping("/jankengame")
