@@ -31,6 +31,13 @@
     <div>相手の手：[[${janken.cpuHand}]]</div>
     <div>結果：[[${janken.result}]]</div>
   </div>
+  <h2>アクティブな試合</h2>
+  <div th:each="matchInfo : ${matchInfos}">
+    id:[[${matchInfo.id}]]
+    user1:[[${matchInfo.user1}]]
+    user2:[[${matchInfo.user2}]]
+    isActive:[[${matchInfo.isActive}]]
+  </div>
   <h2>試合結果</h2>
   <div th:each="match : ${matches}">
     id:[[${match.id}]]

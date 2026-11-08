@@ -11,7 +11,7 @@
   <div><a href="/logout">ログアウト</a></div>
   <h1>Match</h1>
   <h2>[[${login_user}]] vs [[${opponent.name}]]</h2>
-  <div th:if="${opponent.name == 'CPU'}">
+  <div>
     <a th:href="@{/fight(id=${opponent.id},hand='Gu')}">グー</a>
     <a th:href="@{/fight(id=${opponent.id},hand='Choki')}">チョキ</a>
     <a th:href="@{/fight(id=${opponent.id},hand='Pa')}">パー</a>
