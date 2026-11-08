@@ -5,11 +5,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wait</title>
+  <script th:if="${match == null}">
+    window.onload = function () {
+      var result = document.getElementById("result");
+      var sse = new EventSource(result.dataset.resultUrl);
+      sse.onmessage = function (event) {
+        var match = JSON.parse(event.data);
+        document.getElementById("match-result").textContent =
+          "Match: id " + match.id + " user1: " + match.user1 + " user2: " + match.user2 +
+          " user1Hand: " + match.user1Hand + " user2Hand: " + match.user2Hand;
+        result.style.display = "block";
+        sse.close();
+      };
+    };
+  </script>
 </head>
 
 <body>
   <h1>相手の手を待ってます</h1>
   <div>Hi [[${login_user}]]</div>
+  <div id="result" th:style="${match == null} ? 'display: none;' : ''"
+    th:attr="data-result-url=@{/janken/result(opponentId=${opponentId},afterId=${afterId})}">
+    <h2>結果</h2>
+    <div id="match-result">
+      <span th:if="${match != null}">
+        Match: id [[${match.id}]] user1: [[${match.user1}]] user2: [[${match.user2}]]
+        user1Hand: [[${match.user1Hand}]] user2Hand: [[${match.user2Hand}]]
+      </span>
+    </div>
+    <a th:href="@{/janken}">もどる</a>
+  </div>
 </body>
 
 </html>
