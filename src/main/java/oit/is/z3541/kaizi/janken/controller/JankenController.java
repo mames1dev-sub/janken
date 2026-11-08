@@ -72,12 +72,26 @@ public class JankenController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "手はGu、Choki、Paのいずれかを指定してください。");
     }
 
-    MatchInfo matchInfo = new MatchInfo();
-    matchInfo.setUser1(user.getId());
-    matchInfo.setUser2(opponent.getId());
-    matchInfo.setUser1Hand(hand);
-    matchInfo.setIsActive(true);
-    matchInfoMapper.insertMatchInfo(matchInfo);
+    MatchInfo matchInfo = matchInfoMapper.selectActiveByUsers(opponent.getId(), user.getId());
+    if (matchInfo == null) {
+      matchInfo = new MatchInfo();
+      matchInfo.setUser1(user.getId());
+      matchInfo.setUser2(opponent.getId());
+      matchInfo.setUser1Hand(hand);
+      matchInfo.setIsActive(true);
+      matchInfoMapper.insertMatchInfo(matchInfo);
+    } else {
+      Match match = new Match();
+      match.setUser1(matchInfo.getUser1());
+      match.setUser2(matchInfo.getUser2());
+      match.setUser1Hand(matchInfo.getUser1Hand());
+      match.setUser2Hand(hand);
+      match.setIsActive(true);
+      matchMapper.insertMatch(match);
+
+      matchInfo.setIsActive(false);
+      matchInfoMapper.updateById(matchInfo);
+    }
 
     model.addAttribute("login_user", loginUser);
     return "wait.html";
